@@ -1,5 +1,6 @@
 const express = require("express")
 const { validAuthorization } = require("../common/validate")
+const { sendChat } = require("../service/openai")
 let router = express.Router()
 
 router.use(validAuthorization)
@@ -40,14 +41,14 @@ router.get("/gpt/available-models", (req, res) => {
  *     parameters:
  *       - name: model
  *         in: path
- *         description: desc...
+ *         description: OpenAI LLM Model을 선택
  *         required: true
  *         schema:
  *           type: string
  *           enum: [gpt-3.5-turbo, gpt-3.5-turbo-0125, gpt-3.5-turbo-16k, gpt-4, gpt-4-turbo-preview]
  *       - name: message
  *         in: query
- *         description: desc...
+ *         description: User Message를 입력
  *         required: true
  *         schema:
  *           type: string
@@ -117,15 +118,36 @@ router.post("/gpt/:model", (req, res) => {
  *       200:
  *         description: Success
  */
-router.post("/gpt/:model/detail", (req, res) => {
+router.post("/gpt/:model/detail", async (req, res) => {
     const apiKey = req.get("X-API-KEY")
-    const model = req.params.model
-    const body = req.body
-    console.log(`apiKey: ${apiKey}`)
-    console.log(`model: ${model}`)
-    console.log(`body: ${JSON.stringify(body)}`)
+    const modelName = req.params.model
+    const requestMessages = req.body
 
-    res.status(200).send()
+    try {
+        const result = await sendChatMessage(
+            apiKey, 
+            modelName,
+            requestMessages
+        )
+        res.status(200).send(result)
+    } catch (e) {
+        res.status(e.message).send("API Key is가 존재하지 않습니다.")
+    }
 })
+
+const sendChatMessage = async (apiKey, modelName, { messages, systemMessage, temperature, maxLength }) => {
+    const result = await sendChat(
+        apiKey, 
+        modelName,
+        {
+            messages,
+            systemMessage: systemMessage || undefined,
+            temperature: temperature || 1,
+            maxLength: maxLength || 256    
+        }
+    )
+
+    return result
+}
 
 module.exports = router

@@ -4,7 +4,7 @@ const swaggerUI = require("swagger-ui-express")
 const openai = require("./routes/openai")
 const anthropic = require("./routes/anthropic")
 
-const port = process.env.PORT || 5000
+const port = process.env.PORT || 5001
 const app = express()
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -14,7 +14,7 @@ app.use("/api/anthropic", anthropic)
 
 const swaggerOptions = {
     swaggerDefinition: {
-        openai: "3.0.0",
+        openapi: "3.0.0",
         info: {
             title: "Miracom LLM API Service",
             version: "1.0.0",
@@ -24,7 +24,7 @@ const swaggerOptions = {
             securitySchemes: {
                 ApiKeyAuth: {
                     type: "apiKey",
-                    name: "X-API_KEY",
+                    name: "X-API-KEY",
                     in: "header"
                 }
             }
@@ -40,4 +40,4 @@ app.get("/", (req, res) => {
     res.redirect("/api-docs")
 })
 
-app.listen(PORT, () => console.log(`listening on ${PORT}`))
+app.listen(port, () => console.log(`listening on ${port}`))
