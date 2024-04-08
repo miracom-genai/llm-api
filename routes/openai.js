@@ -131,7 +131,7 @@ router.post("/gpt/:model/detail", async (req, res) => {
         )
         res.status(200).send(result)
     } catch (e) {
-        res.status(e.message).send("API Key is가 존재하지 않습니다.")
+        res.status(e.message).send(`This is not a legal API Key. API Key: ${apiKey}`)
     }
 })
 
